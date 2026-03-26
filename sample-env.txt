@@ -37,3 +37,11 @@ NAS_PROTO=nfs                # Use 'nfs' or 'cifs'
 # Only needed if NAS_PROTO=cifs
 SMB_USER=admin
 SMB_PASS=password123
+
+# --- HOMEPAGE PRE-CONFIG ---
+SONARR_API_KEY=your_key_here
+RADARR_API_KEY=your_key_here
+LIDARR_API_KEY=your_key_here
+PROWLARR_API_KEY=your_key_here
+BAZARR_API_KEY=your_key_here
+QBIT_PASSWORD=adminadmin

@@ -1,0 +1,15 @@
+- search:
+    provider: google
+    showOptional: true
+    focus: true
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /data
+
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+      dateStyle: long

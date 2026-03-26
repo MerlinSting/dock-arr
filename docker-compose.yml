@@ -1,4 +1,18 @@
 services:
+# Homepage - dashboard
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - 3000:3000
+    volumes:
+      - ./homepage/config:/app/config # All your preconfig goes here
+      - /var/run/docker.sock:/var/run/docker.sock:ro # To see container status
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
 # Sonarr - TV Shows
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest

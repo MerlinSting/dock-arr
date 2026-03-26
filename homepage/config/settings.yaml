@@ -1,0 +1,11 @@
+title: Dock-arr Media Lab
+layout:
+  Media Management:
+    style: grid
+    columns: 4
+  Automation & Data:
+    style: grid
+    columns: 4
+  Infrastructure:
+    style: grid
+    columns: 4

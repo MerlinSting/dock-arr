@@ -1,0 +1,71 @@
+- Media Management:
+    - Sonarr:
+        icon: sonarr.png
+        href: http://localhost:8989
+        widget:
+          type: sonarr
+          url: http://sonarr:8989
+          key: ${SONARR_API_KEY}
+    - Radarr:
+        icon: radarr.png
+        href: http://localhost:7878
+        widget:
+          type: radarr
+          url: http://radarr:7878
+          key: ${RADARR_API_KEY}
+    - Lidarr:
+        icon: lidarr.png
+        href: http://localhost:8686
+        widget:
+          type: lidarr
+          url: http://lidarr:8686
+          key: ${LIDARR_API_KEY}
+    - Whisparr:
+        icon: whisparr.png
+        href: http://localhost:6969
+
+- Automation & Data:
+    - Prowlarr:
+        icon: prowlarr.png
+        href: http://localhost:9696
+        widget:
+          type: prowlarr
+          url: http://prowlarr:9696
+          key: ${PROWLARR_API_KEY}
+    - Bazarr:
+        icon: bazarr.png
+        href: http://localhost:6767
+        widget:
+          type: bazarr
+          url: http://bazarr:6767
+          key: ${BAZARR_API_KEY}
+    - FlareSolverr:
+        icon: flaresolverr.png
+        href: http://localhost:8191
+        description: Captcha Bypass
+    - Profilarr:
+        icon: profilarr.png # You may need to download this icon to /config/icons
+        href: http://localhost:6868
+        description: Profile Sync
+
+- Infrastructure:
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: http://localhost:8080
+        widget:
+          type: qbittorrent
+          url: http://gluetun:8080
+          username: admin
+          password: ${QBIT_PASSWORD}
+    - Gluetun:
+        icon: gluetun.png
+        href: http://localhost:8888
+        description: VPN Gateway
+    - Dozzle:
+        icon: dozzle.png
+        href: http://localhost:8081
+        description: Real-time Logs
+    - Decluttarr:
+        icon: manual # Placeholder icon
+        href: http://localhost:5000 # Standard port, adjust if different
+        description: Queue Cleaner
