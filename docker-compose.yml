@@ -1,0 +1,224 @@
+services:
+# Sonarr - TV Shows
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./sonarr/config:/config
+      - ${ROOT_MEDIA_PATH}:/data # Access to /data/downloads and /data/media/tv
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  # Radarr - Movies
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./radarr/config:/config
+      - ${ROOT_MEDIA_PATH}:/data # Access to /data/downloads and /data/media/movies
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+# Prowlarr - Indexer centralized management
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+# Profilarr & Decluttarr (Config only, no media access needed usually)
+  profilarr:
+    image: santiagosayshey/profilarr:latest
+    container_name: profilarr
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ./profilarr/config:/config
+    ports:
+      - 6868:6868
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+    depends_on:
+      - sonarr
+      - radarr
+
+# FlareSolverr - Bypasses Cloudflare protection for Indexers
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - TZ=${TZ}
+    ports:
+      - 8191:8191
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+# Gluetun - VPN Client
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=${VPN_TYPE}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - VPN_PORT_FORWARDING=${VPN_PORT_FORWARDING}
+      - HTTP_PROXY=on # Optional: Enables an internal proxy for other apps
+    ports:
+      - 8888:8888 # Health check and control
+      - 6881:6881 # qBittorrent P2P port
+      - 6881:6881/udp
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent
+    network_mode: "service:gluetun" # The "Magic" line
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ./qbittorrent/config:/config
+      - ${ROOT_MEDIA_PATH}:/data # Access to /data/downloads
+    depends_on:
+      gluetun:
+        condition: service_started    # Use service_healthy if VPN is configured
+        # condition: service_healthy  # Wait for VPN to be up first
+
+# Lidarr - Music
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./lidarr/config:/config
+      - ${ROOT_MEDIA_PATH}:/data
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  # Bazarr - Subtitles
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./bazarr/config:/config
+      - ${ROOT_MEDIA_PATH}:/data
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  # whisper-ai - Local Subtitle Generation (Requires GPU)
+  whisper-ai:
+    image: ${WHISPER_IMAGE_URL} # Use a pre-built image like "jellyfin-whisper-lab/whisper-container"
+    container_name: whisper-ai
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./whisper/config:/config
+      - ${ROOT_MEDIA_PATH}:/data
+    # Enable GPU access if you have one, or comment out the 'deploy' section for CPU-only:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  # Decluttarr - Queue Cleaner
+  decluttarr:
+    image: hotio/decluttarr:latest
+    container_name: decluttarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DECLUTTARR_CRON="*/15 * * * *" 
+      # API Keys/URLs for Sonarr, Radarr, etc. go here post-setup!
+    volumes:
+      - ./decluttarr/config:/config
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+# Whisparr - Adult # Optional, niche
+  whisparr:
+    image: ghcr.io/whisparr/whisparr:latest
+    container_name: whisparr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./whisparr/config:/config
+      - ${WHISPARR_MEDIA_PATH}:/data
+    ports:
+      - 6969:6969
+    restart: unless-stopped
+    networks:
+      - internal-proxy
+
+  # Dozzle - Real-Time Container Log Viewer
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    volumes:
+      # CRITICAL: Mounts the Docker socket to read logs from ALL other containers
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8081:8080 # Using 8081 to avoid conflict with qBittorrent's 8080 UI
+    restart: always
+    # Note: Dozzle does not need to be on the internal-proxy network.
+
+networks:
+  internal-proxy:
+    driver: bridge

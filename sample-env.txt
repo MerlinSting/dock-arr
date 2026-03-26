@@ -1,0 +1,39 @@
+# Rename to .env
+
+# --- DOCKER CONFIG DETAILS ---
+# User and Group IDs for Permissions
+PUID=1000
+PGID=1000
+TZ=America/Toronto
+
+# Global Paths for Download Client and *Arr Apps
+# If local path:
+STORAGE_ROOT=/mnt/media
+
+ROOT_MEDIA_PATH=/mnt/media/main
+WHISPARR_MEDIA_PATH=/mnt/media/whisparr
+
+# Network Settings
+PROXY_NETWORK=internal-proxy
+
+# Hotio qBittorrentVPN Settings / another VPN option
+VPN_SERVICE_PROVIDER=off
+VPN_USER=your_vpn_username
+VPN_PASS=your_vpn_password
+VPN_OPENVPN_CONFIG=
+
+# If using NordVPN, uncomment a server name below:
+# OPENVPN_CONFIG=NordVPN/servers/countries/united_states/seattle.ovpn
+# If using PIA, define the region:
+# REGION=us_east
+
+# --- NAS CONNECTION DETAILS ---
+USE_NAS=true  # Set to false if you don't want to mount the NAS
+
+NAS_IP=192.168.1.100
+NAS_EXPORT=/volume1/media
+NAS_PROTO=nfs                # Use 'nfs' or 'cifs'
+
+# Only needed if NAS_PROTO=cifs
+SMB_USER=admin
+SMB_PASS=password123
