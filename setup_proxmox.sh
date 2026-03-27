@@ -5,18 +5,6 @@
 
 source /dev/stdin <<<$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/api.func)
 
-function header_info {
-  clear
-  cat <<"EOF"
-    ____       __    _                ______
-   / __ \___  / /_  (_)___ _____     <  /__ \
-  / / / / _ \/ __ \/ / __ `/ __ \    / /__/ /
- / /_/ /  __/ /_/ / / /_/ / / / /   / // __/
-/_____/\___/_.___/_/\__,_/_/ /_/   /_//____/
-
-EOF
-}
-header_info
 echo -e "\n Loading..."
 GEN_MAC=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 RANDOM_UUID="$(cat /proc/sys/kernel/random/uuid)"
