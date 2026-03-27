@@ -586,7 +586,20 @@ if [ "$START_VM" == "yes" ]; then
   msg_info "Starting Debian 12 VM"
   qm start $VMID
   msg_ok "Started Debian 12 VM"
+  
+  msg_ok "Setting up Dock-arr"
+  # Wait for the Guest Agent to become responsive
+  msg_info "Waiting for Guest Agent to initialize..."
+  until qm guest exec $VMID -- uptime >/dev/null 2>&1; do
+    sleep 2
+  done
+  msg_ok "Guest Agent is online"
+
+  # Dockarr Setup
+  msg_info "Running Remote Setup Script from GitHub..."
+  SETUP_URL="https://raw.githubusercontent.com/MerlinSting/dock-arr/main/setup_dockarr.sh"
+  qm guest exec $VMID -- bash -c "curl -fsSL $SETUP_URL | bash"
+
 fi
 
 msg_ok "Completed successfully!\n"
-echo "More Info at https://github.com/community-scripts/ProxmoxVE/discussions/836"
